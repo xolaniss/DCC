@@ -12,7 +12,7 @@ library(readxl)
 library(stringr)
 library(zoo)
 library(tidyverse)
-setwd("/Users/xolanisibande/Desktop/hong_tests_202005")
+setwd("/Users/xolanisibande/Desktop/DCC_Causality/hong_tests_202005")
 rm(list=ls())
 Sys.setenv(TZ="Africa/Johannesburg")
 theme <- theme_minimal(base_size = 6)  + theme(axis.text.x = element_text(angle = 90))
@@ -251,10 +251,13 @@ discrete <- function(pvalue) {
 }
 
 dollar_pound_monthly_residuals$ph1 <- discrete(dollar_pound_monthly_residuals$ph1)
+dollar_pound_monthly_residuals$ph1[1] <- 0
 dollar_pound_monthly_residuals$ph2<- discrete(dollar_pound_monthly_residuals$ph2)
 dollar_pound_monthly_residuals$ph10<- discrete(dollar_pound_monthly_residuals$ph10)
+dollar_pound_monthly_residuals$ph10[1] <- 0
 dollar_pound_monthly_residuals$ph20<- discrete(dollar_pound_monthly_residuals$ph20)
 dollar_pound_monthly_residuals$phb<- discrete(dollar_pound_monthly_residuals$phb)
+dollar_pound_monthly_residuals$phb[1] <- 0
 #Exporting 
 
 write.csv(dollar_pound_monthly_residuals, file="dollar_pound_monthly_residuals.csv", row.names = F);
