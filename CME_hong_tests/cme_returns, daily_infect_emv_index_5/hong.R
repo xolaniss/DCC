@@ -26,7 +26,7 @@ data <-read.csv("/Users/xolanisibande/DCC/CME_hong_tests/infections.csv", string
 
 # Cleaning ----
 str(data)
-is.na(data) <- data==0
+data[data==0] <- 0.00000001
 data <- na.omit(data)
 data$date <- as.Date(data$date , "%Y-%m-%d")
 

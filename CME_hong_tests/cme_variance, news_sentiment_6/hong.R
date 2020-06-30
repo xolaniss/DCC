@@ -26,7 +26,7 @@ data <-read.csv("/Users/xolanisibande/DCC/CME_hong_tests/sentiment.csv", strings
 
 # Cleaning ----
 str(data)
-is.na(data) <- data==0
+data[data==0] <- 0.00000001
 data <- na.omit(data)
 data$date <- as.Date(data$date , "%Y-%m-%d")
 
@@ -254,6 +254,7 @@ results$ph2<- discrete(results$ph2)
 results$ph10<- discrete(results$ph10)
 results$ph20<- discrete(results$ph20)
 results$phb<- discrete(results$phb)
+
 #Exporting 
 
 write.csv(results, file="results.csv", row.names = F);
