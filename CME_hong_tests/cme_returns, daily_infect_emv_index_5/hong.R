@@ -12,6 +12,7 @@ library(readxl)
 library(stringr)
 library(zoo)
 library(tidyverse)
+library(scales)
 setwd("/Users/xolanisibande/DCC/CME_hong_tests/cme_returns, daily_infect_emv_index_5")
 rm(list=ls())
 Sys.setenv(TZ="Africa/Johannesburg")
@@ -242,7 +243,7 @@ colnames(results) <- c("date","H1","ph1","H2","ph2","H10","ph10","H20","ph20","H
 
 #Merging dates for graphing
 
-results$date <- as.yearmon(data$date[-c(1:4)],  format = "%Y-%m-%d")
+results$date <- data$date[-c(1:4)]
 
 # Discrete p values
 discrete <- function(pvalue) {
@@ -268,7 +269,7 @@ plot<- data %>%
   ggplot(aes(x = date, y = !! y.var )) +
   geom_line() +
   geom_rug(aes(color= !! z.var), inherit.aes = T, sides = "b", show.legend = F) +
-  scale_x_yearmon() +
+  scale_x_date(labels=date_format("%b %y")) +
   labs(x = "", y = "Causality Test Statistic", subtitle = "") +
   scale_color_manual(values = c(col1, col2))
   ggsave(plot, file=paste(plot.name,"_graph", ".png", sep=''), scale = 1, width=7, height=7)
