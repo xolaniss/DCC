@@ -25,9 +25,13 @@ Sheets <-Sheets_import("CME_balanced.xlsx")
 
 Sheets$sentiment$...1 <- as.Date(Sheets$sentiment$...1, "%m/%d/%Y")
 names(Sheets$sentiment) <- c("date", "cme_returns",	"news_sentiment",	"cme_variance")
+Sheets$sentiment <- na.omit(Sheets$sentiment)
 
-Sheets$ infections$...1 <- as.Date(Sheets$ infections$...1, "%m/%d/%Y")
+Sheets$infections$...1 <- as.Date(Sheets$ infections$...1, "%m/%d/%Y")
+Sheets$infections[,5] <- NULL
+Sheets$infections <- na.omit(Sheets$infections)
 names(Sheets$infections) <- c("date", "cme_returns",	"daily_infect_emv_index",	"cme_variance")
+
 
 # Exporting Data
 
