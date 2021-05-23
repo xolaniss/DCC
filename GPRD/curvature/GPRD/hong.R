@@ -30,14 +30,9 @@ data <-read_csv("../../Clean_Data.csv")
 u = data$Curvature
 v = data$GPRD
 date = data$Date
-
-
 u=u-mean(u);
 v=v-mean(v);
-
 T=length(date);
-
-
 
 ##################
 ##### Define the lag M in DCC-MGARCH Hong and Haugh tests ;
@@ -227,7 +222,7 @@ results <- read.csv("mgarch_Hong_Granger.csv")
 #Renaming ----
 results[, 1] <- NULL
 colnames(results) <- c("date","H1","ph1","H2","ph2","H10","ph10","H20","ph20","Hb","phb")
-
+results <- results %>% select(date,H1, ph1, H10, ph10)
 
 #Merging dates for graphing
 results$date <- data$Date[-c(1:15)]
@@ -238,20 +233,22 @@ discrete <- function(pvalue) {
 }
 
 results$ph1 <- discrete(results$ph1)
-results$ph2 <- discrete(results$ph2)
+#results$ph2 <- discrete(results$ph2)
 results$ph10 <- discrete(results$ph10)
-results$ph20 <- discrete(results$ph20)
-results$phb <- discrete(results$phb)
-results$ph1[1] <- 0
-results$ph2[1] <- 0
-results$ph10[1] <- 0
-results$ph20[1] <- 0
-results$phb[1] <- 0 
+#results$ph20 <- discrete(results$ph20)
+#results$phb <- discrete(results$phb)
 
-#Exporting 
+# Initializing rug plots
+results$ph1[1] <- 0
+#results$ph2[1] <- 0
+results$ph10[1] <- 0
+#results$ph20[1] <- 0
+#results$phb[1] <- 0 
+
+# Exporting 
 write.csv(results, file="results.csv", row.names = FALSE);
 
-#Graphing
+# Graphing
 rug_plot <- function(data, y.var, z.var, plot.name) {
   y.var <- enquo(y.var)
   z.var <- enquo(z.var)
@@ -267,8 +264,8 @@ plot<- data %>%
 }          
 
 rug_plot(results, y.var = H1, z.var = ph1, plot.name = "results_ph1")
-rug_plot(results, y.var = H2, z.var = ph2, plot.name = "results_ph2")
+#rug_plot(results, y.var = H2, z.var = ph2, plot.name = "results_ph2")
 rug_plot(results, y.var = H10, z.var = ph10, plot.name = "results_ph10")
-rug_plot(results, y.var = H20, z.var = ph20, plot.name = "results_ph20")
-rug_plot(results, y.var = Hb, z.var = phb, plot.name = "results_phb")
+#rug_plot(results, y.var = H20, z.var = ph20, plot.name = "results_ph20")
+#rug_plot(results, y.var = Hb, z.var = phb, plot.name = "results_phb")
 

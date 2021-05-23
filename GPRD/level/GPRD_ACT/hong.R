@@ -13,7 +13,7 @@ library(stringr)
 library(zoo)
 library(tidyverse)
 library(scales)
-setwd("/Users/xolanisibande/DCC/LCE/curvature")
+setwd("/Users/xolanisibande/DCC/GPRD/level/GPRD_ACT")
 rm(list=ls())
 Sys.setenv(TZ="Africa/Johannesburg")
 theme <- theme_minimal(base_size = 6)  + theme(axis.text.x = element_text(angle = 90))
@@ -23,30 +23,21 @@ col2 <- "#000000"
 
 
 # Importing Sheets ----
-data <-read.csv("../LCE.csv", stringsAsFactors = FALSE)
-
-# Cleaning ----
-data$Date <- as.Date(data$Date , "%Y-%m-%d")
-str(data)
+data <-read_csv("../../Clean_Data.csv")
 
 # Defining Variables ----
 
-u = data$CURVATURE
-v = data$EMVID
+u = data$Level
+v = data$GPRD_ACT
 date = data$Date
-
-
 u=u-mean(u);
 v=v-mean(v);
-
 T=length(date);
-
-
 
 ##################
 ##### Define the lag M in DCC-MGARCH Hong and Haugh tests ;
 ##################
-M=7; 
+M=16; 
 
 # define the correlations between u and v with lags -M,-M+1,...,-1,0,1,..,M
 # the lag is positive;correlation of U and V(-k); V Granger causes U;
@@ -58,7 +49,7 @@ corr0=matrix(0,T,1);
 
 dcc.data=cbind(u,v);
 
-# the intial value for the estimation
+# the initial value for the estimation
 a1=cov(u,u); a2=cov(v,v); # covariance of U and v for the initial values of u and v condional variance
 cri=cor(u,v); # initial value for correlation
 
@@ -109,8 +100,7 @@ for (k in 1:M) {
 for (k in 1:M) {
   
   uk=u[1:(T-k)]; # the 1st market lead  2nd market;     
-  vk=v[(1+k):T]; 
-  # Market 2 is affected by Market 1.
+  vk=v[(1+k):T]; # Market 2 is affected by Market 1.
   # ???ֶ?????ζ???г?2?ܵ??г?1??Ӱ?? 
   
   dcc.data=cbind(uk,vk);
@@ -222,13 +212,9 @@ for (t in 1: T) {
 #### output the stastics and corresponding p-values 
 outhong=cbind(date,H1,ph1,H2,ph2,H10,ph10,H20,ph20,Hb,phb);
 outHong=outhong[(M:T),];
-
 outhaugh=cbind(date,Q1,p1,Q2,p2,Q10,p10,Q20,p20,Qb,pb);
 outHaugh=outhaugh[(M:T),]; 
-
-
 write.csv(outHong, file="mgarch_Hong_Granger.csv", sep = " ");
-
 
 #Importing
 results <- read.csv("mgarch_Hong_Granger.csv")
@@ -236,13 +222,10 @@ results <- read.csv("mgarch_Hong_Granger.csv")
 #Renaming ----
 results[, 1] <- NULL
 colnames(results) <- c("date","H1","ph1","H2","ph2","H10","ph10","H20","ph20","Hb","phb")
-
+results <- results %>% select(date,H1, ph1, H10, ph10)
 
 #Merging dates for graphing
-
-results$date <- data$Date[-c(1:6)]
-
-
+results$date <- data$Date[-c(1:15)]
 
 # Discrete p values
 discrete <- function(pvalue) {
@@ -250,18 +233,22 @@ discrete <- function(pvalue) {
 }
 
 results$ph1 <- discrete(results$ph1)
-results$ph2<- discrete(results$ph2)
-results$ph10<- discrete(results$ph10)
-results$ph20<- discrete(results$ph20)
-results$phb<- discrete(results$phb)
-results$phb[1] <- 0 
+#results$ph2 <- discrete(results$ph2)
+results$ph10 <- discrete(results$ph10)
+#results$ph20 <- discrete(results$ph20)
+#results$phb <- discrete(results$phb)
 
-#Exporting 
+# Initializing rug plots
+results$ph1[1] <- 0
+#results$ph2[1] <- 0
+results$ph10[1] <- 0
+#results$ph20[1] <- 0
+#results$phb[1] <- 0 
 
-write.csv(results, file="results.csv", row.names = F);
+# Exporting 
+write.csv(results, file="results.csv", row.names = FALSE);
 
-#Graphing
-
+# Graphing
 rug_plot <- function(data, y.var, z.var, plot.name) {
   y.var <- enquo(y.var)
   z.var <- enquo(z.var)
@@ -270,15 +257,15 @@ plot<- data %>%
   ggplot(aes(x = date, y = !! y.var )) +
   geom_line() +
   geom_rug(aes(color= !! z.var), inherit.aes = T, sides = "b", show.legend = F) +
-  scale_x_date(labels=date_format("%b - %y")) +
+  scale_x_date(labels=date_format("%b-%y")) +
   labs(x = "", y = "Causality Test Statistic", subtitle = "") +
   scale_color_manual(values = c(col1, col2))
-  ggsave(plot, file=paste(plot.name,"_graph", ".png", sep=''), scale = 1, width=7, height=7)
+  ggsave(plot, file=paste(plot.name,"_graph", ".png", sep=''), scale = 1, width=5, height=5)
 }          
 
 rug_plot(results, y.var = H1, z.var = ph1, plot.name = "results_ph1")
-rug_plot(results, y.var = H2, z.var = ph2, plot.name = "results_ph2")
+#rug_plot(results, y.var = H2, z.var = ph2, plot.name = "results_ph2")
 rug_plot(results, y.var = H10, z.var = ph10, plot.name = "results_ph10")
-rug_plot(results, y.var = H20, z.var = ph20, plot.name = "results_ph20")
-rug_plot(results, y.var = Hb, z.var = phb, plot.name = "results_phb")
+#rug_plot(results, y.var = H20, z.var = ph20, plot.name = "results_ph20")
+#rug_plot(results, y.var = Hb, z.var = phb, plot.name = "results_phb")
 
